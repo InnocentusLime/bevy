@@ -595,6 +595,8 @@ impl AssetServer {
         loop {
             match channel.receiver.try_recv() {
                 Ok(AssetLifecycleEvent::Create(result)) => {
+                    assets.set_untracked(result.id, *result.asset);
+
                     // update SourceInfo if this asset was loaded from an AssetPath
                     if let HandleId::AssetPathId(id) = result.id {
                         let asset_sources = asset_sources_guard
@@ -608,8 +610,6 @@ impl AssetServer {
                             }
                         }
                     }
-
-                    assets.set_untracked(result.id, *result.asset);
                 }
                 Ok(AssetLifecycleEvent::Free(handle_id)) => {
                     if let HandleId::AssetPathId(id) = handle_id {
